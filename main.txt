@@ -1,0 +1,975 @@
+#include <SDL.h>
+#include <SDL_image.h>
+#include <stdio.h>
+#include<time.h>
+#include<stdlib.h>
+#include<stdbool.h>
+#include<SDL_ttf.h>
+
+// Constants for tile size and screen size
+#define TILE_SIZE 40
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#define MAP_WIDTH 160
+#define MAP_HEIGHT 15
+
+// Define tile types
+#define TILE_EMPTY 0
+#define TILE_GROUND 1
+#define TILE_BRICK 2
+#define TILE_COIN 3
+#define MOVEMENT_SPEED 5
+#define ANIMATION_SPEED 50 // Milliseconds per frame
+#define FALSE 0
+#define TRUE 1
+
+// Define maximum camera movement speed
+//#define CAMERA_SPEED 20
+SDL_Texture* sprite_texture[5][4];
+SDL_Rect sprite = { 20, 100, 40, 40};
+SDL_Texture* textures1[8];
+SDL_Texture* textures2[10];
+SDL_Window* window;
+SDL_Renderer* renderer;
+int game_is_running = FALSE;
+int startColumn;
+int endColumn;
+int jumping = 0;
+int falling = 1;
+int jumpStartY;
+int map = 0;
+int gameMap1[MAP_HEIGHT][MAP_WIDTH];
+int gameMap2[MAP_HEIGHT][MAP_WIDTH];
+int cameraX = 0;
+int movingRight = 0;
+int movingLeft = 0;
+int game_over = 0;
+int frame = 0; // Current frame of the animation
+int walkingDirection = 0; // 0: right, 1: left
+Uint32 walkingTimer = 0; // Timer for walking animation
+// Main loop
+SDL_Event event;
+int quit = 0;
+const int FONT_SIZE_TITLE = 90;
+const int FONT_SIZE_PRESS_TO_START = 60;
+const SDL_Color TEXT_COLOR = { 255, 255, 255, 255 }; // White
+const char* TITLE_TEXT = "OBSTACLE MAYHEM";
+const char* PRESS_TO_START_TEXT = "Press Enter To Start";
+TTF_Font* fontPressToStart;
+TTF_Font* fontTitle;
+SDL_Texture* pressToStartTexture;
+SDL_Texture* backgroundTexture;
+SDL_Texture* titleTexture;
+int titleWidth = 0, titleHeight = 0;
+int pressToStartWidth = 0, pressToStartHeight = 0;
+
+// Jump speed and height
+int jumpSpeed = 20;
+int jumpHeight = 200;
+int characterBottom; // Bottom y-coordinate of the character
+int characterRight;  // Right x-coordinate of the character
+int characterLeft;
+// Function to initialize SDL
+void initializeSDL() {
+    SDL_Init(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_PNG);
+}
+// lvl4 not need
+void renderSprite() {
+    SDL_RenderCopy(renderer, sprite_texture[walkingDirection][frame], NULL, &sprite);
+}
+// lvl4 not need
+int start_screen() {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        printf("SDL initialization failed: %s\n", SDL_GetError());
+        return;
+    }
+
+    if (TTF_Init() != 0) {
+        printf("SDL_ttf initialization failed: %s\n", TTF_GetError());
+        SDL_Quit();
+        return;
+    }
+
+    // Create window and renderer
+    SDL_Window* window = SDL_CreateWindow("Obstacle Mayhem", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (!window) {
+        printf("Failed to create window: %s\n", SDL_GetError());
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        printf("Failed to create renderer: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    // Load background texture
+     backgroundTexture = IMG_LoadTexture(renderer, "background.jpg");
+    if (!backgroundTexture) {
+        printf("Failed to load background texture: %s\n", SDL_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    // Load font
+    fontTitle = TTF_OpenFont("Honk-Regular-VariableFont_MORF,SHLN.ttf", FONT_SIZE_TITLE);
+    fontPressToStart = TTF_OpenFont("Micro5-Regular.ttf", FONT_SIZE_PRESS_TO_START);
+    if (!fontTitle || !fontPressToStart) {
+        printf("Failed to load font: %s\n", TTF_GetError());
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    // Create title text surface and texture
+    SDL_Surface* titleSurface = TTF_RenderText_Solid(fontTitle, TITLE_TEXT, TEXT_COLOR);
+    if (!titleSurface) {
+        printf("Failed to render title text: %s\n", TTF_GetError());
+        TTF_CloseFont(fontTitle);
+        TTF_CloseFont(fontPressToStart);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+     titleTexture = SDL_CreateTextureFromSurface(renderer, titleSurface);
+    if (!titleTexture) {
+        printf("Failed to create texture from title surface: %s\n", SDL_GetError());
+        SDL_FreeSurface(titleSurface);
+        TTF_CloseFont(fontTitle);
+        TTF_CloseFont(fontPressToStart);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    SDL_FreeSurface(titleSurface);
+
+    // Create "Press Enter to Start Game" text surface and texture
+    SDL_Surface* pressToStartSurface = TTF_RenderText_Solid(fontPressToStart, PRESS_TO_START_TEXT, TEXT_COLOR);
+
+    if (!pressToStartSurface) {
+        printf("Failed to render text: %s\n", TTF_GetError());
+        TTF_CloseFont(fontTitle);
+        TTF_CloseFont(fontPressToStart);
+        SDL_DestroyTexture(titleTexture);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+     pressToStartTexture = SDL_CreateTextureFromSurface(renderer, pressToStartSurface);
+
+    if (!pressToStartTexture) {
+        printf("Failed to create texture from surface: %s\n", SDL_GetError());
+        SDL_FreeSurface(pressToStartSurface);
+        TTF_CloseFont(fontTitle);
+        TTF_CloseFont(fontPressToStart);
+        SDL_DestroyTexture(titleTexture);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return;
+    }
+
+    SDL_FreeSurface(pressToStartSurface);
+
+    TTF_CloseFont(fontTitle);
+    TTF_CloseFont(fontPressToStart);
+
+    // Get texture width and height
+
+    SDL_QueryTexture(titleTexture, NULL, NULL, &titleWidth, &titleHeight);
+
+
+    SDL_QueryTexture(pressToStartTexture, NULL, NULL, &pressToStartWidth, &pressToStartHeight);
+    bool quit = false;
+    while (!quit) {
+        // Event handling
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                quit = true;
+            }
+            else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN && !game_is_running) {
+                game_is_running = true;
+                SDL_DestroyTexture(titleTexture); // Remove the title texture after starting the game
+                SDL_DestroyTexture(pressToStartTexture); // Remove the press to start texture after starting the game
+                quit = true;
+            }
+        }
+        SDL_RenderClear(renderer);
+
+        // Render background
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+
+        // Render title text
+        SDL_Rect titleRect = { (SCREEN_WIDTH - titleWidth) / 2, 50, titleWidth, titleHeight };
+        SDL_RenderCopy(renderer, titleTexture, NULL, &titleRect);
+        if (!game_is_running) {
+            SDL_Rect pressToStartRect = { (SCREEN_WIDTH - pressToStartWidth) / 2, SCREEN_HEIGHT / 2, pressToStartWidth, pressToStartHeight };
+            SDL_RenderCopy(renderer, pressToStartTexture, NULL, &pressToStartRect);
+            SDL_RenderPresent(renderer);
+
+            // Delay to control frame rate
+            SDL_Delay(10);
+        }
+        else {
+
+            SDL_DestroyTexture(titleTexture);
+            SDL_DestroyTexture(pressToStartTexture);
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            TTF_Quit();
+            SDL_Quit();
+            return 1;
+        }
+    }
+} 
+// lvl4 no need
+// lvl 4 no need
+void set_map1() {
+    for (int i = 0; i < MAP_HEIGHT - 3; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            gameMap1[i][j] = 2;
+        }
+    }
+
+    for (int i = MAP_HEIGHT - 3; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            if (j != 5 && j != 6)
+                gameMap1[i][j] = 1;
+        }
+    }
+
+    for (int i = 9; i < MAP_WIDTH - 1; i = i + 15) {
+        int x = rand() % 2;
+        gameMap1[11][i] = 4;
+        gameMap1[11][i + 1] = 5;
+        gameMap1[10][i] = 7;
+        gameMap1[10][i + 1] = 6;
+        if (x == 1) {
+            gameMap1[14][i + 7] = 2;
+            gameMap1[14][i + 8] = 2;
+            gameMap1[13][i + 7] = 2;
+            gameMap1[13][i + 8] = 2;
+            gameMap1[12][i + 7] = 2;
+            gameMap1[12][i + 8] = 2;
+        }
+        if (x == 0) {
+            gameMap1[8][i + 8] = 3;
+            gameMap1[14][i + 7] = 2;
+            gameMap1[14][i + 8] = 2;
+            gameMap1[14][i + 9] = 2;
+            gameMap1[13][i + 7] = 2;
+            gameMap1[13][i + 8] = 2;
+            gameMap1[13][i + 9] = 2;
+            gameMap1[12][i + 7] = 2;
+            gameMap1[12][i + 8] = 2;
+            gameMap1[12][i + 9] = 2;
+        }
+
+    }
+    gameMap1[14][5] = 2;
+    gameMap1[14][6] = 2;
+    gameMap1[13][5] = 2;
+    gameMap1[13][6] = 2;
+    gameMap1[12][5] = 2;
+    gameMap1[12][6] = 2;
+}
+void setmap2() {
+    for (int i = 0; i < MAP_HEIGHT - 3; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            gameMap2[i][j] = 2;
+        }
+    }
+
+    for (int i = MAP_HEIGHT - 3; i < MAP_HEIGHT; i++) {
+        for (int j = 0; j < MAP_WIDTH; j++) {
+            if (j != 5 && j != 6)
+                gameMap2[i][j] = 1;
+        }
+    }
+
+    for (int i = 9; i < MAP_WIDTH - 1; i = i + 15) {
+        int x = rand() % 2;
+        gameMap2[11][i] = 4;
+        gameMap2[11][i + 1] = 5;
+        gameMap2[10][i] = 7;
+        gameMap2[10][i + 1] = 6;
+        if (x == 1) {
+            gameMap2[14][i + 7] = 2;
+            gameMap2[14][i + 8] = 2;
+            gameMap2[13][i + 7] = 2;
+            gameMap2[13][i + 8] = 2;
+            gameMap2[12][i + 7] = 2;
+            gameMap2[12][i + 8] = 2;
+            gameMap2[11][i + 9] = 8;
+            gameMap2[11][i + 12] = 8;
+            //   gameMap2[11][i + 11] = 8;
+             //  gameMap2[11][i + 12] = 8;
+        }
+        if (x == 0) {
+            gameMap2[8][i + 8] = 3;
+            gameMap2[14][i + 7] = 2;
+            gameMap2[14][i + 8] = 2;
+            gameMap2[14][i + 9] = 2;
+            gameMap2[13][i + 7] = 2;
+            gameMap2[13][i + 8] = 2;
+            gameMap2[13][i + 9] = 2;
+            gameMap2[12][i + 7] = 2;
+            gameMap2[12][i + 8] = 2;
+            gameMap2[12][i + 9] = 2;
+            gameMap2[11][i + 11] = 8;
+            gameMap2[11][i + 12] = 8;
+
+        }
+
+    }
+    gameMap2[14][5] = 2;
+    gameMap2[14][6] = 2;
+    gameMap2[13][5] = 2;
+    gameMap2[13][6] = 2;
+    gameMap2[12][5] = 2;
+    gameMap2[12][6] = 2;
+}
+// lvl 4 no need
+void load_map_texture() {
+    textures1[TILE_GROUND] = IMG_LoadTexture(renderer, "block.png");
+    textures1[TILE_BRICK] = IMG_LoadTexture(renderer, "sky.png");
+    textures1[TILE_COIN] = IMG_LoadTexture(renderer, "coin.png");
+    textures1[TILE_EMPTY] = IMG_LoadTexture(renderer, "sol.png");
+    textures1[4] = IMG_LoadTexture(renderer, "tuyau1.png");
+    textures1[5] = IMG_LoadTexture(renderer, "tuyau2.png");
+    textures1[6] = IMG_LoadTexture(renderer, "tuyau3.png");
+    textures1[7] = IMG_LoadTexture(renderer, "tuyau4.png");
+}
+// lvl 4 no need
+void load_map2_texture() {
+    textures2[TILE_GROUND] = IMG_LoadTexture(renderer, "block2.jpg");
+    textures2[TILE_BRICK] = IMG_LoadTexture(renderer, "sky.png");
+    textures2[TILE_COIN] = IMG_LoadTexture(renderer, "coin.png");
+    textures2[TILE_EMPTY] = IMG_LoadTexture(renderer, "sol.png");
+    textures2[4] = IMG_LoadTexture(renderer, "tuyau1.png");
+    textures2[5] = IMG_LoadTexture(renderer, "tuyau2.png");
+    textures2[6] = IMG_LoadTexture(renderer, "tuyau3.png");
+    textures2[7] = IMG_LoadTexture(renderer, "tuyau4.png");
+    textures2[8] = IMG_LoadTexture(renderer, "spike.png");
+}
+// lvl 4 no need
+void load_sprite_texture() {
+    sprite_texture[0][0] = IMG_LoadTexture(renderer, "standing1.png");
+    sprite_texture[0][1] = IMG_LoadTexture(renderer, "standing2.png");
+    sprite_texture[0][2] = IMG_LoadTexture(renderer, "standing3.png");
+    sprite_texture[0][3] = IMG_LoadTexture(renderer, "standing3.png");
+    sprite_texture[1][0] = IMG_LoadTexture(renderer, "right1.png");
+    sprite_texture[1][1] = IMG_LoadTexture(renderer, "right2.png");
+    sprite_texture[1][2] = IMG_LoadTexture(renderer, "right3.png");
+    sprite_texture[1][3] = IMG_LoadTexture(renderer, "right3.png");
+    sprite_texture[2][0] = IMG_LoadTexture(renderer, "left1.png");
+    sprite_texture[2][1] = IMG_LoadTexture(renderer, "left2.png");
+    sprite_texture[2][2] = IMG_LoadTexture(renderer, "left3.png");
+    sprite_texture[2][3] = IMG_LoadTexture(renderer, "left3.png");
+    sprite_texture[3][0] = IMG_LoadTexture(renderer, "jump1.png");
+    sprite_texture[3][1] = IMG_LoadTexture(renderer, "jump2.png");
+    sprite_texture[3][2] = IMG_LoadTexture(renderer, "jump3.png");
+    sprite_texture[3][3] = IMG_LoadTexture(renderer, "jump4.png");
+    sprite_texture[4][0] = IMG_LoadTexture(renderer, "fall1.png");
+    sprite_texture[4][1] = IMG_LoadTexture(renderer, "fall2.png");
+    sprite_texture[4][2] = IMG_LoadTexture(renderer, "fall3.png");
+    sprite_texture[4][3] = IMG_LoadTexture(renderer, "fall4.png");
+    
+
+}
+// lvl 4 no need
+void updateAnimation(Uint32 currentTime) {
+    if (movingRight && !movingLeft && !jumping && !falling) {
+        walkingDirection = 1;
+    }
+    else if (movingLeft && !movingRight && !jumping && !falling) {
+        walkingDirection = 2;
+    }
+    else if (!movingLeft && !movingRight && !jumping)
+        walkingDirection = 0;
+    else if (jumping)
+        walkingDirection = 3;
+    else if (falling)
+        walkingDirection = 4;
+    if (walkingDirection != 0 && walkingDirection!=3 && walkingDirection !=4) {
+        if (currentTime - walkingTimer >= ANIMATION_SPEED) {
+            walkingTimer = currentTime;
+            frame = (frame + 1) % 4;
+        }
+    }
+    else if(walkingDirection==0) {
+        if (currentTime - walkingTimer >= 100) {
+            walkingTimer = currentTime;
+            frame = (frame + 1) % 4;
+        }
+    }
+    else if (walkingDirection == 3 && !movingLeft) {
+        if (sprite.y == 475) {
+            frame = 0;
+        }
+        frame = 1;
+
+    }
+    else if (walkingDirection == 3 && movingLeft) {
+        if (sprite.y == 475)
+            frame = 2;
+        else
+            frame = 3;
+
+    }
+    else if (walkingDirection == 4 && !movingLeft) {
+        if (sprite.y == 475)
+            frame = 1;
+        else
+           frame = 0;
+    }
+    else if (walkingDirection == 4 && movingLeft) {
+        if (sprite.y == 475)
+            frame = 3;
+        else
+            frame = 2;
+    }
+
+
+
+}
+// lvl 4 no need
+void vertical_collision() {
+    if (map == 0) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = startColumn; x < endColumn; x++) {
+                if (gameMap1[y][x] == TILE_GROUND || gameMap1[y][x] == TILE_COIN || gameMap1[y][x] == TILE_EMPTY) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+
+                    // Check if character's bottom collides with block's top
+                    if (characterBottom >= blockTop && sprite.y < blockTop && characterLeft < blockRight && characterRight > blockLeft) {
+                        sprite.y = blockTop - sprite.h;
+                        falling = 0;
+                        break;
+                    }
+
+                    // Check if character's top collides with block's bottom while falling
+                    if (jumping && characterBottom > blockTop && characterLeft < blockRight && characterRight > blockLeft) {
+                        sprite.y = blockBottom;
+                        jumping = 0;
+                         //falling = 1;
+                    }
+                }
+            }
+            if (!falling) break;
+        }
+    }
+    if (map == 1) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = startColumn; x < endColumn; x++) {
+                if (gameMap2[y][x] == TILE_GROUND || gameMap2[y][x] == TILE_COIN || gameMap2[y][x] == TILE_EMPTY) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+
+                    // Check if character's bottom collides with block's top
+                    if (characterBottom >= blockTop && sprite.y < blockTop && characterLeft < blockRight && characterRight > blockLeft) {
+                        sprite.y = blockTop - sprite.h;
+                        falling = 0;
+                        break;
+                    }
+
+                    // Check if character's top collides with block's bottom while falling
+                    if (jumping && characterBottom > blockTop && characterLeft < blockRight && characterRight > blockLeft) {
+                        sprite.y = blockBottom;
+                        jumping = 0;
+                        // falling = 1;
+                    }
+                }
+            }
+            if (!falling) break;
+        }
+    }
+
+
+
+}
+// lvl 4 no need
+void horizontal_collsion() {
+    if (map == 0) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = startColumn; x < endColumn; x++) {
+                if (gameMap1[y][x] == TILE_GROUND) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+
+                    if (sprite.x + sprite.w >= blockLeft && sprite.x <= blockRight && characterBottom > blockTop && sprite.y < blockBottom) {
+                        if (sprite.x + sprite.w / 2 < (blockLeft + blockRight) / 2) {
+                            sprite.x = blockLeft - sprite.w;
+                        }
+                        else {
+                            sprite.x = blockRight;
+                        }
+                    }
+                }
+                else if (gameMap1[y][x] == 4 || gameMap1[y][x] == 5 || gameMap1[y][x] == 6 || gameMap1[y][x] == 7) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+                    if (sprite.x + sprite.w >= blockLeft && sprite.x <= blockRight && characterBottom > blockTop && sprite.y < blockBottom) {
+                        if (sprite.x + sprite.w / 2 < (blockLeft + blockRight) / 2) {
+                            sprite.x = blockLeft - sprite.w;
+                        }
+                        else {
+                            sprite.x = 0;
+                        }
+                    }
+                }
+            }
+        };
+    }
+    if (map == 1) {
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = startColumn; x < endColumn; x++) {
+                if (gameMap2[y][x] == TILE_GROUND) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+
+                    if (sprite.x + sprite.w >= blockLeft && sprite.x <= blockRight && characterBottom > blockTop && sprite.y < blockBottom) {
+                        if (sprite.x + sprite.w / 2 < (blockLeft + blockRight) / 2) {
+                            sprite.x = blockLeft - sprite.w;
+                        }
+                        else {
+                            sprite.x = blockRight;
+                        }
+                    }
+                }
+                else if (gameMap2[y][x] == 4 || gameMap2[y][x] == 5 || gameMap2[y][x] == 6 || gameMap2[y][x] == 7) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+                    if (sprite.x + sprite.w >= blockLeft && sprite.x <= blockRight && characterBottom > blockTop && sprite.y < blockBottom) {
+                        if (sprite.x + sprite.w / 2 < (blockLeft + blockRight) / 2) {
+                            sprite.x = blockLeft - sprite.w;
+                        }
+                        else {
+                            sprite.x = 0;
+                        }
+                    }
+                }
+                else if (gameMap2[y][x] == 8) {
+                    int blockTop = y * TILE_SIZE;
+                    int blockBottom = (y + 1) * TILE_SIZE;
+                    int blockLeft = x * TILE_SIZE - cameraX;
+                    int blockRight = (x + 1) * TILE_SIZE - cameraX;
+                    if (sprite.x + sprite.w >= blockLeft && sprite.x <= blockRight && characterBottom > blockTop && sprite.y < blockBottom) {
+                        if (sprite.x + sprite.w / 2 < (blockLeft + blockRight) / 2) {
+                            // sprite.x = blockLeft - sprite.w;
+                            game_over = 1;
+                        }
+                        else {
+                            game_over = 1;
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
+}
+// lvl 4 no need
+void process_input() {
+    SDL_Delay(20);
+    if (sprite.y >= SCREEN_HEIGHT) {
+        game_over = 1;
+    }
+    // Handle events
+    while (SDL_PollEvent(&event)) {
+
+
+
+        // Inside your main loop
+        if (event.type == SDL_QUIT) {
+            quit = 1;
+        }
+        else if (event.type == SDL_KEYDOWN) {
+            switch (event.key.keysym.scancode) {
+            case SDL_SCANCODE_RIGHT:
+                movingRight = 1;
+                break;
+            case SDL_SCANCODE_LEFT:
+                movingLeft = 1;
+                break;
+            case SDL_SCANCODE_UP:
+                // Handle jumping
+                if (!jumping && !falling) {
+                    jumping = 1;
+                    jumpStartY = sprite.y;
+                }
+                break;
+            }
+        }
+        else if (event.type == SDL_KEYUP) {
+            switch (event.key.keysym.scancode) {
+            case SDL_SCANCODE_RIGHT:
+                movingRight = 0;
+                break;
+            case SDL_SCANCODE_LEFT:
+                movingLeft = 0;
+                break;
+            }
+        }
+    }
+
+    if (movingRight) {
+        if (sprite.x >= 400 && cameraX != MAP_WIDTH * TILE_SIZE - SCREEN_WIDTH) {
+            cameraX += MOVEMENT_SPEED;
+            if (cameraX > MAP_WIDTH * TILE_SIZE - SCREEN_WIDTH) {
+                cameraX = MAP_WIDTH * TILE_SIZE - SCREEN_WIDTH;
+            }
+        }
+        else {
+            sprite.x += MOVEMENT_SPEED;
+            if (sprite.x + sprite.w >= SCREEN_WIDTH) {
+                sprite.x = SCREEN_WIDTH - sprite.w;
+                map = 1;
+                sprite.x = 0;
+                sprite.y = 100;
+                cameraX = 0;
+            }
+        }
+    }
+
+    if (movingLeft) {
+        if (sprite.x == SCREEN_WIDTH / 2 && cameraX != 0) {
+            cameraX -= MOVEMENT_SPEED;
+            if (cameraX < 0) {
+                cameraX = 0;
+            }
+        }
+        else {
+            sprite.x -= MOVEMENT_SPEED;
+            if (sprite.x - sprite.w < 0) {
+                sprite.x = 0;
+            }
+        }
+    }
+    if (jumping) {
+        // Move character upward
+        sprite.y -= jumpSpeed;
+
+        // Check if reached maximum jump height
+        if (sprite.y <= jumpStartY - jumpHeight) {
+            jumping = 0;
+            falling = 1; // Start falling
+        }
+        if (sprite.y <= (jumpStartY - jumpHeight) / 2 && movingRight) {
+            jumping = 0;
+            falling = 1;
+            movingRight = 0;
+        }
+    }
+
+
+    // Left x-coordinate of the character
+
+    characterBottom = sprite.y + sprite.h; // Bottom y-coordinate of the character
+    characterRight = sprite.x + sprite.w;  // Right x-coordinate of the character
+    characterLeft = sprite.x;
+    if (falling)
+        sprite.y += 10;
+    falling = 1;
+    if (sprite.y <= 480) {
+        vertical_collision();
+    }
+
+    horizontal_collsion();
+
+
+
+}
+
+// Function to render the game map
+// lvl 4 no need
+void renderMap(SDL_Renderer* renderer, int gameMap[][MAP_WIDTH], SDL_Texture* textures[], int cameraX) {
+    // Calculate the visible range of tiles based on camera position
+    startColumn = cameraX / TILE_SIZE;
+    endColumn = (cameraX + SCREEN_WIDTH) / TILE_SIZE + 1;
+    endColumn = (endColumn > MAP_WIDTH) ? MAP_WIDTH : endColumn;
+
+    // Loop through the visible range of tiles in the game map array
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = startColumn; x < endColumn; x++) {
+            // Calculate the position to render each tile
+            int xPos = x * TILE_SIZE - cameraX;
+            int yPos = y * TILE_SIZE;
+
+            // Determine the tile type and render accordingly
+            switch (gameMap[y][x]) {
+            case TILE_EMPTY:
+            {
+                // Render empty space (optional)
+                SDL_Rect solRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_EMPTY], NULL, &solRect);
+                break;
+            }
+            case TILE_GROUND:
+            {
+                // Render ground
+                SDL_Rect groundRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_GROUND], NULL, &groundRect);
+                break;
+            }
+            case TILE_BRICK:
+            {
+                // Render brick
+                SDL_Rect brickRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_BRICK], NULL, &brickRect);
+                break;
+            }
+            case TILE_COIN:
+            {
+                // Render coin (optional)
+                SDL_Rect coinRect = { xPos, yPos, 40, 40 };
+                SDL_RenderCopy(renderer, textures[TILE_COIN], NULL, &coinRect);
+                break;
+            }
+            case 4:
+            {
+                SDL_Rect obs1Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[4], NULL, &obs1Rect);
+                break;
+            }
+            case 5:
+            {
+                SDL_Rect obs2Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[5], NULL, &obs2Rect);
+                break;
+            }
+            case 6:
+            {
+                SDL_Rect obs3Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[6], NULL, &obs3Rect);
+                break;
+            }
+            case 7:
+            {
+                SDL_Rect obs4Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[7], NULL, &obs4Rect);
+                break;
+            }
+            //     case 8:
+             //    {
+              //       SDL_Rect forRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+              //       SDL_RenderCopy(renderer, textures[8], NULL, &forRect);
+              //       break;
+              //   }
+
+            default:
+                // Handle unknown tile types (optional)
+                break;
+            }
+        }
+    }
+}
+// lvl 4 no need
+void renderMap2(SDL_Renderer* renderer, int gameMap[][MAP_WIDTH], SDL_Texture* textures[], int cameraX) {
+    // Calculate the visible range of tiles based on camera position
+    startColumn = cameraX / TILE_SIZE;
+    endColumn = (cameraX + SCREEN_WIDTH) / TILE_SIZE + 1;
+    endColumn = (endColumn > MAP_WIDTH) ? MAP_WIDTH : endColumn;
+
+    // Loop through the visible range of tiles in the game map array
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = startColumn; x < endColumn; x++) {
+            // Calculate the position to render each tile
+            int xPos = x * TILE_SIZE - cameraX;
+            int yPos = y * TILE_SIZE;
+
+            // Determine the tile type and render accordingly
+            switch (gameMap[y][x]) {
+            case TILE_EMPTY:
+            {
+                // Render empty space (optional)
+                SDL_Rect solRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_EMPTY], NULL, &solRect);
+                break;
+            }
+            case TILE_GROUND:
+            {
+                // Render ground
+                SDL_Rect groundRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_GROUND], NULL, &groundRect);
+                break;
+            }
+            case TILE_BRICK:
+            {
+                // Render brick
+                SDL_Rect brickRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_BRICK], NULL, &brickRect);
+                break;
+            }
+            case TILE_COIN:
+            {
+                // Render coin (optional)
+                SDL_Rect coinRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[TILE_COIN], NULL, &coinRect);
+                break;
+            }
+            case 4:
+            {
+                SDL_Rect obs1Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[4], NULL, &obs1Rect);
+                break;
+            }
+            case 5:
+            {
+                SDL_Rect obs2Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[5], NULL, &obs2Rect);
+                break;
+            }
+            case 6:
+            {
+                SDL_Rect obs3Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[6], NULL, &obs3Rect);
+                break;
+            }
+            case 7:
+            {
+                SDL_Rect obs4Rect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[7], NULL, &obs4Rect);
+                break;
+            }
+            case 8:
+            {
+                SDL_Rect forRect = { xPos, yPos, TILE_SIZE, TILE_SIZE };
+                SDL_RenderCopy(renderer, textures[8], NULL, &forRect);
+                break;
+            }
+
+            default:
+                // Handle unknown tile types (optional)
+                break;
+            }
+        }
+    }
+}
+
+// Main function
+int main(int argc, char* args[]) {
+
+        game_is_running = start_screen();
+            srand(time(NULL));
+            // Initialize SDL
+            initializeSDL();
+
+
+
+            // Create window and renderer
+            window = SDL_CreateWindow("Game Map Rendering", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+            load_map_texture();
+            set_map1();
+
+            // sprite_texture = IMG_LoadTexture(renderer, "spritesheet_1-ezgif.com-crop.png");
+            load_map2_texture();
+
+            setmap2();
+            load_sprite_texture();
+
+
+            SDL_Texture* background = IMG_LoadTexture(renderer, "BG_1.png");
+            SDL_Texture* game_Over = IMG_LoadTexture(renderer, "lost.png");
+
+
+            // Initialize camera position
+            // ekhane while e variable diye change korte hobe
+            while (!quit) {
+                Uint32 currentTime = SDL_GetTicks();
+                process_input();
+
+                // Clear screen
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                SDL_RenderClear(renderer);
+
+                // renderSprite(renderer, sprite_texture);
+
+                 // Render game map
+
+                if (map == 0) {
+                    //   SDL_RenderCopy(renderer, background, NULL, NULL);
+                    if (game_over == 0) {
+                        //  handleMovementInput();
+                        updateAnimation(currentTime);
+                        renderMap(renderer, gameMap1, textures1, cameraX);
+                        renderSprite();
+                    }
+                    // renderMap(renderer, gameMap, textures1, cameraX);
+                    // renderSprite(renderer, sprite_texture);
+                    if (game_over == 1) {
+
+                        SDL_RenderCopy(renderer, game_Over, NULL, NULL);
+                    }
+                }
+                if (map == 1) {
+                    if (game_over == 0) {
+                        //     handleMovementInput();
+                        updateAnimation(currentTime);
+                        renderMap2(renderer, gameMap2, textures2, cameraX);
+                        renderSprite();
+                    }
+                    if (game_over == 1) {
+                        SDL_RenderCopy(renderer, game_Over, NULL, NULL);
+                    }
+                }
+
+
+                // Update screen
+                SDL_RenderPresent(renderer);
+            }
+       
+
+    // Cleanup
+    for (int i = 0; i < 4; i++) {
+        SDL_DestroyTexture(textures1[i]);
+    }
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    IMG_Quit();
+    SDL_Quit();
+    return 0;
+}

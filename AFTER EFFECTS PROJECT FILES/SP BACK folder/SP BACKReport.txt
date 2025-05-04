@@ -1,0 +1,53 @@
+Report created: 
+	6/7/2024	7:33:14 PM
+
+Project name: SP BACK.aep
+
+Source files collected to: 
+	E:\SDL\AFTER EFFECTS PROJECT FILES\SP BACK folder
+
+Source files collected: All
+
+Collected comps:  
+	Comp 1
+	Pre-comp 1
+	Pre-comp 2
+	Pre-comp 3
+	Comp 2
+	9428d4a5845ce6c95748a55e9c756f8e65ffe7c4.jpg Comp 1
+	start
+	Comp 3
+	peakpx (1)
+	
+Number of collected files:  8
+
+Size of collected files:  1.7 MB
+
+Collected source files: 
+	C:\Users\admin\Downloads\134afb178559999.Y3JvcCwzMTcwLDI0ODAsMTY0LDA.png
+	C:\Users\admin\Downloads\9428d4a5845ce6c95748a55e9c756f8e65ffe7c4.jpg
+	C:\Users\admin\Downloads\desktop-wallpaper-iori-yagami-3d-chou-skin.jpg
+	C:\Users\admin\Downloads\Lovepik_com-450103420-Game Over Text T-Shirt Pattern.png
+	C:\Users\admin\Downloads\peakpx (1).jpg
+	C:\Users\admin\Downloads\pngwing.com_1.png
+	C:\Users\admin\Downloads\pxfuel.jpg
+	E:\SDL\iori cutscene.png
+	
+Rendering plug-ins:
+	Classic 3D
+	
+Effects used:  4
+
+Effect:  Deep Glow
+	
+Effect:  Fill
+	
+Effect:  Looks
+	
+Effect:  S_DropShadow
+	
+
+Layer:  Text Layer
+	External dependencies:  
+		Font family: “Who asks Satan”, Font style: “Regular”
+

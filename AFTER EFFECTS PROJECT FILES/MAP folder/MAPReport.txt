@@ -1,0 +1,53 @@
+Report created: 
+	6/7/2024	7:32:44 PM
+
+Project name: MAP.aep
+
+Source files collected to: 
+	E:\SDL\AFTER EFFECTS PROJECT FILES\MAP folder
+
+Source files collected: All
+
+Collected comps:  
+	3dGGa
+	Pre-comp 1
+	1 Comp 1
+	2 Comp 1
+	3 Comp 1
+	
+Number of collected files:  14
+
+Size of collected files:  19.4 MB
+
+Collected source files: 
+	C:\Users\admin\Downloads\240_F_717834459_Y45pMh2bC4na4gymf6WDUjUtVdrNwZWY.jpg
+	C:\Users\admin\Downloads\2D FIGHTING GAME STAGES.gif
+	C:\Users\admin\Downloads\3dGGa.mp4
+	C:\Users\admin\Downloads\Best-fighting-game-stages.webp
+	C:\Users\admin\Downloads\bg2.png
+	C:\Users\admin\Downloads\Iori new - Mirrored\Iori Interaction Start\Iori Yagami_361.png
+	C:\Users\admin\Downloads\Let it rain!.gif
+	C:\Users\admin\Downloads\PlayStation - Mega Man X6 - Rain Effect.png
+	C:\Users\admin\Downloads\tumblr_abe66b4fc5602f36dca6e59642db5587_30aa8b39_2048.gif
+	C:\Users\admin\Downloads\wallpaperflare.com_wallpaper (1).jpg
+	C:\Users\admin\Downloads\wp4077057-red-moon-wallpapers.jpg
+	C:\Users\admin\Downloads\wp4077067-red-moon-wallpapers.jpg
+	C:\Users\admin\Pictures\Screenshots\Screenshot (605).png
+	C:\Users\admin\Pictures\Screenshots\Screenshot (606).png
+	
+Number of missing items:  1
+
+Rendering plug-ins:
+	Classic 3D
+	
+Effects used:  4
+
+Effect:  Color Key
+	
+Effect:  Curves
+	
+Effect:  Looks
+	
+Effect:  VC Color Vibrance
+	
+

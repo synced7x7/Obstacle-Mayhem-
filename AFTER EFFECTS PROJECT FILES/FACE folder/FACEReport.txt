@@ -1,0 +1,26 @@
+Report created: 
+	6/7/2024	7:32:19 PM
+
+Project name: FACE.aep
+
+Source files collected to: 
+	E:\SDL\AFTER EFFECTS PROJECT FILES\FACE folder
+
+Source files collected: All
+
+Collected comps:  
+	Comp 1
+	
+Number of collected files:  4
+
+Size of collected files:  499 KB
+
+Collected source files: 
+	C:\Users\admin\Downloads\83m881qriu0ktq56ldiu3ivefs-755bbc4b25fc8db3d8eef61e7a6f1a85.png
+	C:\Users\admin\Downloads\Iori Yagami Face Art - King of Fighters Art Gallery.jpeg
+	C:\Users\admin\Downloads\Kyo Kusanagi Face Art - King of Fighters Art Gallery.jpeg
+	C:\Users\admin\Downloads\Yagami Iori  - The King of Fighters - Image #936711 - Zerochan Anime Image Board.jpeg
+	
+Rendering plug-ins:
+	Classic 3D
+	

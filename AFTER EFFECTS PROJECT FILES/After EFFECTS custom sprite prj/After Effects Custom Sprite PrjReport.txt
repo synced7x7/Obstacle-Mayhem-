@@ -1,0 +1,170 @@
+Report created: 
+	6/7/2024	7:31:06 PM
+
+Project name: After Effects Custom Sprite Prj.aep
+
+Source files collected to: 
+	E:\SDL\AFTER EFFECTS PROJECT FILES\After EFFECTS custom sprite prj
+
+Source files collected: All
+
+Collected comps:  
+	Game Boy Advance - The King of Fighters EX NeoBlood - Iori Yagami
+	Pre-comp 1
+	SET 2 CVS
+	SET 1 CVS
+	SET 1
+	Pre-comp 2
+	SET 3 CVS
+	SET 4
+	LAST SET
+	Sp sprite
+	Pre-comp 3
+	Orochi saga
+	Pre-comp 4
+	Stand sprite
+	Pre-comp 5
+	Pre-comp 6
+	Pre-comp 7
+	Iori HQ
+	Comp 1
+	Iori main
+	Pre-comp 9
+	Iori Chibi
+	Jump
+	Pre-comp 10
+	Kyo main
+	iori sp
+	kyo effects
+	test
+	health bar
+	Pre-comp 11
+	Pre-comp 12
+	HIT EFFECTS LAT
+	Pre-comp 13
+	
+Number of collected files:  93
+
+Size of collected files:  8.0 MB
+
+Collected source files: 
+	C:\Users\admin\Downloads\abstract-straight-lines-seamless-pattern-free-vector.jpg
+	C:\Users\admin\Downloads\Back O.png
+	C:\Users\admin\Downloads\Backward.png
+	C:\Users\admin\Downloads\Fly.png
+	C:\Users\admin\Downloads\Forward.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00000.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00001.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00002.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00003.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00004.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00005.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00006.png
+	C:\Users\admin\Downloads\HIT 24\jkFX Hit Effect 04 by JasonKeyser on DeviantArt (1)_00007.png
+	C:\Users\admin\Downloads\hit effect.png
+	C:\Users\admin\Downloads\Iori End Rev.png
+	C:\Users\admin\Downloads\Iori got hit and fell.png
+	C:\Users\admin\Downloads\Iori got hit.png
+	C:\Users\admin\Downloads\Iori Kick.png
+	C:\Users\admin\Downloads\iori range.png
+	C:\Users\admin\Downloads\Iori scratch combo 1.png
+	C:\Users\admin\Downloads\iori sp 1.png
+	C:\Users\admin\Downloads\iori sp 3.png
+	C:\Users\admin\Downloads\iori sp2.png
+	C:\Users\admin\Downloads\Iori Start Rev.png
+	C:\Users\admin\Downloads\Iori Yagami_272.png
+	C:\Users\admin\Downloads\Jump O.png
+	C:\Users\admin\Downloads\Kyo backward.png
+	C:\Users\admin\Downloads\kyo combo 1.png
+	C:\Users\admin\Downloads\Kyo combo 2.png
+	C:\Users\admin\Downloads\kyo effect 1.png
+	C:\Users\admin\Downloads\kyo effect 2.png
+	C:\Users\admin\Downloads\kyo effect 3.png
+	C:\Users\admin\Downloads\kyo effect 4.png
+	C:\Users\admin\Downloads\Kyo forward.png
+	C:\Users\admin\Downloads\Kyo game over.png
+	C:\Users\admin\Downloads\Kyo got hit.png
+	C:\Users\admin\Downloads\Kyo Hit fall and get back.png
+	C:\Users\admin\Downloads\Kyo jump.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_143.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_144.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_145.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_146.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_337.png
+	C:\Users\admin\Downloads\Kyo Kusanagi\Kyo Kusanagi_338.png
+	C:\Users\admin\Downloads\Kyo Kusanagi_425.png
+	C:\Users\admin\Downloads\Kyo range.png
+	C:\Users\admin\Downloads\Kyo run.png
+	C:\Users\admin\Downloads\kyo running combo.png
+	C:\Users\admin\Downloads\kyo SP.png
+	C:\Users\admin\Downloads\Kyo stand.png
+	C:\Users\admin\Downloads\Kyo Starter.png
+	C:\Users\admin\Downloads\Mobile - Senran no Samurai Kingdom JPN - Iori Yagami (1).png
+	C:\Users\admin\Downloads\O Roght.png
+	C:\Users\admin\Downloads\O stand.png
+	C:\Users\admin\Downloads\Orochi Iori Running.png
+	C:\Users\admin\Downloads\Running combo.png
+	C:\Users\admin\Downloads\Running Iori.png
+	C:\Users\admin\Downloads\SP.png
+	C:\Users\admin\Downloads\sprite_sheet.png
+	C:\Users\admin\Downloads\—Pngtree—mobile interface progress bar_4752593.png
+	E:\SDL\Game Boy Advance - The King of Fighters EX NeoBlood - Iori Yagami.png
+	E:\SDL\iori_yagami_cvs_sprite_sheet_by_shubuster_debodgk.png
+	E:\SDL\Orochi Iori\Orochi Iori_219.png
+	E:\SDL\Orochi Iori\Orochi Iori_220.png
+	E:\SDL\Orochi Iori\Orochi Iori_221.png
+	E:\SDL\Orochi Iori\Orochi Iori_222.png
+	E:\SDL\Orochi Iori\Orochi Iori_223.png
+	E:\SDL\Orochi Iori\Orochi Iori_224.png
+	E:\SDL\Orochi Iori\Orochi Iori_225.png
+	E:\SDL\Orochi Iori\Orochi Iori_232.png
+	E:\SDL\Orochi Iori\Orochi Iori_233.png
+	E:\SDL\Orochi Iori\Orochi Iori_234.png
+	E:\SDL\Orochi Iori\Orochi Iori_235.png
+	E:\SDL\Orochi Iori\Orochi Iori_236.png
+	E:\SDL\Orochi Iori\Orochi Iori_237.png
+	E:\SDL\Orochi Iori\Orochi Iori_238.png
+	E:\SDL\Orochi Iori\Orochi Iori_239.png
+	E:\SDL\Orochi Iori\Orochi Iori_240.png
+	E:\SDL\Orochi Iori\Orochi Iori_241.png
+	E:\SDL\Orochi Iori\Orochi Iori_242.png
+	E:\SDL\Orochi Iori\Orochi Iori_243.png
+	E:\SDL\Orochi Iori\Orochi Iori_244.png
+	E:\SDL\Orochi Iori\Orochi Iori_245.png
+	E:\SDL\Orochi Iori\Orochi Iori_246.png
+	E:\SDL\Orochi Iori\Orochi Iori_247.png
+	E:\SDL\Orochi Iori\Orochi Iori_248.png
+	E:\SDL\Orochi Iori\Orochi Iori_249.png
+	E:\SDL\Orochi Iori\Orochi Iori_250.png
+	E:\SDL\Orochi Iori\Orochi Iori_251.png
+	E:\SDL\Orochi Iori\Orochi Iori_252.png
+	E:\SDL\Orochi Iori\Orochi Iori_253.png
+	E:\SDL\Orochi Iori\Orochi Iori_254.png
+	E:\SDL\Orochi Iori\Orochi Iori_255.png
+	
+Number of missing items:  1
+
+Rendering plug-ins:
+	Classic 3D
+	
+Effects used:  7
+
+Effect:  Change Color
+	
+Effect:  Deep Glow
+	
+Effect:  Fill
+	
+Effect:  Glow
+	
+Effect:  Hue/Saturation
+	
+Effect:  Linear Color Key
+	
+Effect:  Puppet
+	
+
+Layer:  Text Layer
+	External dependencies:  
+		Font family: “Marola”, Font style: “Regular”
+
